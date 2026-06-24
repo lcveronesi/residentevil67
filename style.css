@@ -845,171 +845,134 @@ kbd {
 /* ═══════════════════════════════════════════════════════════
    CONTROLES MOBILE
 ═══════════════════════════════════════════════════════════ */
+#mobile-controls { display: none; }
 
-#mobile-controls {
-  display: none;
-}
+/* Ativa em qualquer tela touch (tablet, celular) */
+@media (pointer: coarse) {
 
-@media (max-width: 900px), (pointer: coarse) {
-
-  /* Esconde cursor e crosshair no mobile */
   html, body { cursor: default; }
-  #crosshair { display: none; }
+  #crosshair  { display: none !important; }
+  #hud        { transform: scale(0.68); transform-origin: top left; }
+  canvas      { width: 100vw !important; height: 100vh !important; }
 
-  /* Escala o HUD pra não cortar */
-  #hud {
-    transform: scale(0.72);
-    transform-origin: top left;
-  }
-
-  canvas {
-    width: 100vw !important;
-    height: 100vh !important;
-  }
-
-  /* ── Container geral dos controles ── */
+  /* ── Container principal dos controles ── */
   #mobile-controls {
     display: flex;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 220px;
+    height: 200px;
     z-index: 9999;
-    pointer-events: none; /* deixa toques passarem para o canvas exceto nos controles */
     align-items: flex-end;
     justify-content: space-between;
-    padding: 0 12px 18px;
+    padding: 0 14px 18px;
+    /* NÃO colocar pointer-events:none aqui — quebraria os botões */
   }
 
-  /* ── JOYSTICK (esquerda) ── */
+  /* ══ JOYSTICK ══════════════════════════════════════════════ */
   #joystick-zone {
-    pointer-events: all;
-    width: 150px;
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 144px; height: 144px;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
 
   #joystick-base {
-    width: 130px;
-    height: 130px;
+    width: 130px; height: 130px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.07);
-    border: 2px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.22);
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 28px rgba(0,0,0,0.65);
+    /* touch-action none CRÍTICO: impede scroll ao arrastar o joystick */
     touch-action: none;
   }
 
   #joystick-knob {
-    width: 52px;
-    height: 52px;
+    width: 52px; height: 52px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.35), rgba(255,255,255,0.1));
-    border: 2px solid rgba(255,255,255,0.4);
+    background: radial-gradient(circle at 36% 33%,
+      rgba(255,255,255,0.45), rgba(255,255,255,0.10));
+    border: 2px solid rgba(255,255,255,0.5);
     position: absolute;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-    transition: transform 0.05s;
-    pointer-events: none;
+    pointer-events: none;   /* knob não captura eventos, só visual */
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    will-change: transform;
+    transition: none;       /* sem transition — precisa ser instantâneo */
   }
 
-  /* ── BOTÕES DE AÇÃO (direita) ── */
+  /* ══ BOTÕES DE AÇÃO ════════════════════════════════════════ */
   #action-buttons {
-    pointer-events: all;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-end;
+    display: flex; flex-direction: column;
+    gap: 8px; align-items: flex-end;
     flex-shrink: 0;
   }
 
-  #action-row-top,
-  #action-row-mid,
-  #action-row-bot {
-    display: flex;
-    gap: 8px;
+  .act-row {
+    display: flex; gap: 8px; align-items: center;
   }
 
-  .action-btn {
+  .act-btn {
     border: none;
-    border-radius: 12px;
     font-family: 'Courier New', monospace;
-    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.5px;
     color: #fff;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
+    display: flex; align-items: center; justify-content: center;
+    /* impede que tap gere eventos de mouse */
     touch-action: manipulation;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 2px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
-    transition: transform 0.08s, opacity 0.08s;
-    text-transform: uppercase;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none; -webkit-user-select: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6),
+                inset 0 1px 0 rgba(255,255,255,0.15);
   }
+  .act-btn:active { opacity: 0.65; transform: scale(0.88); }
 
-  .action-btn:active {
-    transform: scale(0.9);
-    opacity: 0.75;
-  }
-
-  /* Tamanhos */
+  /* Atirar — grande, redondo, vermelho */
   .btn-shoot {
     width: 80px; height: 80px;
-    background: radial-gradient(circle at 40% 35%, #c0392b, #8B0000);
+    border-radius: 50%; font-size: 30px;
+    background: radial-gradient(circle at 38% 35%, #e74c3c, #7b0000);
     border: 2px solid #e74c3c;
-    font-size: 22px;
-    border-radius: 50%;
-    box-shadow: 0 0 16px rgba(192,57,43,0.5), 0 4px 10px rgba(0,0,0,0.6);
+    box-shadow: 0 0 20px rgba(231,76,60,0.6), 0 4px 14px rgba(0,0,0,0.6);
   }
 
+  /* Coletar — redondo, verde */
   .btn-interact {
-    width: 68px; height: 68px;
-    background: radial-gradient(circle at 40% 35%, #27ae60, #1a6b3c);
+    width: 62px; height: 62px;
+    border-radius: 50%; font-size: 11px; letter-spacing: 0.5px;
+    flex-direction: column; gap: 1px;
+    background: radial-gradient(circle at 38% 35%, #27ae60, #14532d);
     border: 2px solid #2ecc71;
-    font-size: 18px;
-    border-radius: 50%;
   }
 
+  /* Correr — barra horizontal */
   .btn-run {
-    width: 120px; height: 40px;
-    background: linear-gradient(135deg, #7f8c8d, #4a5568);
-    border: 1px solid #95a5a6;
-    border-radius: 20px;
-    font-size: 11px;
-    flex-direction: row;
+    width: 136px; height: 38px;
+    border-radius: 19px; font-size: 11px; letter-spacing: 1px;
     gap: 6px;
+    background: linear-gradient(135deg, #636e72, #2d3436);
+    border: 1px solid #95a5a6;
   }
-
-  .btn-reload {
-    width: 80px; height: 40px;
-    background: linear-gradient(135deg, #2980b9, #1a5276);
-    border: 1px solid #3498db;
-    border-radius: 10px;
-    font-size: 10px;
-  }
-
-  .btn-inventory {
-    width: 80px; height: 40px;
-    background: linear-gradient(135deg, #8e44ad, #5b2c6f);
-    border: 1px solid #9b59b6;
-    border-radius: 10px;
-    font-size: 10px;
-  }
-
-  /* Estado "pressionado" para o botão de correr */
-  .btn-run.running {
-    background: linear-gradient(135deg, #e67e22, #d35400);
+  .btn-run.active-run {
+    background: linear-gradient(135deg, #e67e22, #a04000);
     border-color: #f39c12;
-    box-shadow: 0 0 12px rgba(243,156,18,0.5);
+    box-shadow: 0 0 16px rgba(243,156,18,0.55);
+  }
+
+  /* Recarregar */
+  .btn-reload {
+    width: 82px; height: 38px;
+    border-radius: 10px; font-size: 10px;
+    flex-direction: column; gap: 2px;
+    background: linear-gradient(135deg, #2980b9, #154360);
+    border: 1px solid #3498db;
+  }
+
+  /* Inventário */
+  .btn-inventory {
+    width: 82px; height: 38px;
+    border-radius: 10px; font-size: 10px;
+    flex-direction: column; gap: 2px;
+    background: linear-gradient(135deg, #8e44ad, #4a235a);
+    border: 1px solid #9b59b6;
   }
 }
