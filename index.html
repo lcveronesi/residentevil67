@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RESIDENT EVIL 67</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       TELA INICIAL
+  ═══════════════════════════════════════════ -->
+  <div id="screen-title" class="screen active">
+    <div class="title-bg-overlay"></div>
+    <div class="title-fog"></div>
+
+    <div class="title-content">
+      <div class="title-logo">
+        <span class="title-subtitle">RESIDENT EVIL 67</span>
+        <h1 class="title-main">FUJA<br/><span>DO TUNG TUNG</span></h1>
+        <div class="title-line"></div>
+      </div>
+
+      <nav class="title-menu">
+        <button class="menu-btn" id="btn-new-game">
+          <span class="btn-icon">▶</span> NOVO JOGO
+        </button>
+        <button class="menu-btn" id="btn-how-to-play">
+          <span class="btn-icon">?</span> COMO JOGAR
+        </button>
+        <button class="menu-btn" id="btn-credits">
+          <span class="btn-icon">★</span> CRÉDITOS
+        </button>
+      </nav>
+
+      <div class="title-footer">©LC 2025 RESIDENT EVIL — FUJA DO TUNGTUNG</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TELA COMO JOGAR
+  ═══════════════════════════════════════════ -->
+  <div id="screen-howto" class="screen">
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <h2 class="modal-title">COMO JOGAR</h2>
+        <div class="howto-grid">
+          <div class="howto-section">
+            <h3>MOVIMENTO</h3>
+            <div class="key-row"><kbd>W A S D</kbd> <span>Mover</span></div>
+            <div class="key-row"><kbd>SHIFT</kbd> <span>Correr</span></div>
+            <div class="key-row"><kbd>E</kbd> <span>Interagir</span></div>
+          </div>
+          <div class="howto-section">
+            <h3>COMBATE</h3>
+            <div class="key-row"><kbd>CLICK</kbd> <span>Atirar</span></div>
+            <div class="key-row"><kbd>R</kbd> <span>Recarregar</span></div>
+            <div class="key-row"><kbd>F</kbd> <span>Usar Kit Médico</span></div>
+          </div>
+          <div class="howto-section">
+            <h3>INTERFACE</h3>
+            <div class="key-row"><kbd>TAB</kbd> <span>Inventário</span></div>
+            <div class="key-row"><kbd>ESC</kbd> <span>Pausar</span></div>
+          </div>
+          <div class="howto-section">
+            <h3>OBJETIVO</h3>
+            <p>Encontre 3 chaves coloridas, resolva os puzzles e escape da mansão antes que os mortos-vivos te alcancem.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btn-howto-back">VOLTAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TELA CRÉDITOS
+  ═══════════════════════════════════════════ -->
+  <div id="screen-credits" class="screen">
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <h2 class="modal-title">CRÉDITOS</h2>
+        <div class="credits-content">
+          <div class="credit-item">
+            <span class="credit-role">DESIGN & PROGRAMAÇÃO</span>
+            <span class="credit-name">Mansion Dev Team</span>
+          </div>
+          <div class="credit-item">
+            <span class="credit-role">INSPIRADO EM</span>
+            <span class="credit-name">Resident Evil Classic Series</span>
+          </div>
+          <div class="credit-item">
+            <span class="credit-role">ENGINE</span>
+            <span class="credit-name">HTML5 Canvas + Pure JavaScript</span>
+          </div>
+          <div class="credit-item">
+            <span class="credit-role">ÁUDIO</span>
+            <span class="credit-name">Web Audio API</span>
+          </div>
+          <p class="credits-note">Este jogo é uma obra independente de ficção.<br/>Todos os elementos são originais.</p>
+        </div>
+        <button class="modal-close-btn" id="btn-credits-back">VOLTAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TELA DE JOGO
+  ═══════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <!-- Canvas principal -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div id="hud-left">
+        <div id="health-container">
+          <div class="hud-label">VIDA</div>
+          <div id="health-bar-bg">
+            <div id="health-bar"></div>
+          </div>
+          <span id="health-text">100</span>
+        </div>
+        <div id="stamina-container">
+          <div class="hud-label">STAMINA</div>
+          <div id="stamina-bar-bg">
+            <div id="stamina-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="hud-center">
+        <div id="location-name"></div>
+        <div id="objective-hint"></div>
+      </div>
+
+      <div id="hud-right">
+        <div id="ammo-display">
+          <span id="ammo-current">12</span>
+          <span class="ammo-sep">/</span>
+          <span id="ammo-reserve">48</span>
+          <div class="hud-label">MUNIÇÃO</div>
+        </div>
+        <div id="flashlight-display">
+          <div class="hud-label">LANTERNA</div>
+          <div id="flashlight-bar-bg">
+            <div id="flashlight-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="hud-keys">
+        <div class="key-slot" id="slot-blue">
+          <div class="key-icon blue">🔑</div>
+          <span>AZUL</span>
+        </div>
+        <div class="key-slot" id="slot-red">
+          <div class="key-icon red">🔑</div>
+          <span>VERM.</span>
+        </div>
+        <div class="key-slot" id="slot-gold">
+          <div class="key-icon gold">🔑</div>
+          <span>OURO</span>
+        </div>
+        <div class="key-slot" id="slot-docs">
+          <div class="key-icon doc">📄</div>
+          <span id="doc-count">0/5</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Crosshair -->
+    <div id="crosshair"></div>
+
+    <!-- Painel de interação -->
+    <div id="interact-prompt" class="hidden">
+      <kbd>E</kbd> <span id="interact-text">Interagir</span>
+    </div>
+
+    <!-- Mensagem de notificação -->
+    <div id="notification" class="hidden"></div>
+
+    <!-- Vinheta de dano -->
+    <div id="damage-vignette" class="hidden"></div>
+
+    <!-- Flash de tiro -->
+    <div id="muzzle-flash" class="hidden"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       INVENTÁRIO (overlay)
+  ═══════════════════════════════════════════ -->
+  <div id="screen-inventory" class="screen overlay-screen">
+    <div class="inventory-panel">
+      <div class="inventory-header">
+        <h2>INVENTÁRIO</h2>
+        <span class="inv-close-hint">[TAB] Fechar</span>
+      </div>
+      <div class="inventory-grid" id="inventory-grid">
+        <!-- gerado por JS -->
+      </div>
+      <div class="inventory-inspect" id="inventory-inspect">
+        <div class="inspect-icon" id="inspect-icon">?</div>
+        <div class="inspect-info">
+          <div class="inspect-name" id="inspect-name">Selecione um item</div>
+          <div class="inspect-desc" id="inspect-desc">Clique em um item para ver detalhes.</div>
+          <button class="inspect-use-btn hidden" id="inspect-use-btn">USAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PAUSA
+  ═══════════════════════════════════════════ -->
+  <div id="screen-pause" class="screen overlay-screen">
+    <div class="modal-overlay">
+      <div class="modal-box pause-box">
+        <h2 class="modal-title">PAUSADO</h2>
+        <button class="menu-btn" id="btn-resume">▶ CONTINUAR</button>
+        <button class="menu-btn" id="btn-quit-game">✕ SAIR PARA O MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PUZZLE — PAINEL NUMÉRICO
+  ═══════════════════════════════════════════ -->
+  <div id="screen-puzzle" class="screen overlay-screen">
+    <div class="modal-overlay">
+      <div class="modal-box puzzle-box">
+        <h2 class="modal-title" id="puzzle-title">PAINEL DE ACESSO</h2>
+        <p class="puzzle-hint" id="puzzle-hint">Digite o código correto.</p>
+        <div class="puzzle-display" id="puzzle-display">_ _ _ _</div>
+        <div class="puzzle-keypad">
+          <button class="keypad-btn" data-val="1">1</button>
+          <button class="keypad-btn" data-val="2">2</button>
+          <button class="keypad-btn" data-val="3">3</button>
+          <button class="keypad-btn" data-val="4">4</button>
+          <button class="keypad-btn" data-val="5">5</button>
+          <button class="keypad-btn" data-val="6">6</button>
+          <button class="keypad-btn" data-val="7">7</button>
+          <button class="keypad-btn" data-val="8">8</button>
+          <button class="keypad-btn" data-val="9">9</button>
+          <button class="keypad-btn keypad-clear" data-val="C">C</button>
+          <button class="keypad-btn" data-val="0">0</button>
+          <button class="keypad-btn keypad-enter" data-val="E">OK</button>
+        </div>
+        <p class="puzzle-result" id="puzzle-result"></p>
+        <button class="modal-close-btn" id="btn-puzzle-close">FECHAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       LEITURA DE DOCUMENTO
+  ═══════════════════════════════════════════ -->
+  <div id="screen-document" class="screen overlay-screen">
+    <div class="modal-overlay">
+      <div class="modal-box doc-box">
+        <div class="doc-header">
+          <span class="doc-tag">DOCUMENTO ENCONTRADO</span>
+          <h2 class="doc-title" id="doc-title">—</h2>
+        </div>
+        <div class="doc-body" id="doc-body"></div>
+        <button class="modal-close-btn" id="btn-doc-close">GUARDAR DOCUMENTO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       GAME OVER
+  ═══════════════════════════════════════════ -->
+  <div id="screen-gameover" class="screen">
+    <div class="gameover-content">
+      <div class="gameover-title">VOCÊ MORREU</div>
+      <div class="gameover-subtitle">A mansão reclama mais uma alma...</div>
+      <button class="menu-btn" id="btn-retry">↺ TENTAR NOVAMENTE</button>
+      <button class="menu-btn" id="btn-gameover-menu">☰ MENU PRINCIPAL</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       VITÓRIA
+  ═══════════════════════════════════════════ -->
+  <div id="screen-victory" class="screen">
+    <div class="victory-content">
+      <div class="victory-title" id="victory-title">VOCÊ ESCAPOU!</div>
+      <div class="victory-subtitle" id="victory-subtitle">A mansão ficou para trás... por enquanto.</div>
+      <div id="victory-stats"></div>
+      <button class="menu-btn" id="btn-victory-menu">☰ MENU PRINCIPAL</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
