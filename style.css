@@ -1108,3 +1108,140 @@ kbd {
     padding-bottom: 4px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE LANDSCAPE — controles nas laterais, sem cobrir o jogo
+═══════════════════════════════════════════════════════════ */
+@media (pointer: coarse) and (orientation: landscape) {
+
+  /* Container vira lateral: ocupa altura toda, sem altura fixa no fundo */
+  #mobile-controls {
+    position: fixed;
+    inset: 0;
+    height: 100% !important;
+    width: 100%;
+    display: flex !important;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 10px env(safe-area-inset-bottom, 10px);
+    pointer-events: none;
+    touch-action: none;
+  }
+
+  /* HUD menor e sem colidir com controles */
+  #hud {
+    transform: scale(0.55);
+    transform-origin: top left;
+  }
+
+  /* Chaves do HUD sobem para não ficar atrás dos controles */
+  #hud-keys {
+    bottom: auto;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* ── JOYSTICK ESQUERDO — menor em landscape */
+  #joystick-zone {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+    pointer-events: auto;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  #joystick-base {
+    width: 108px;
+    height: 108px;
+  }
+
+  #joystick-knob {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* ── BOTÕES DE AÇÃO CENTRAIS — coluna compacta no centro-esquerdo */
+  #action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-end;
+    justify-content: center;
+    max-width: 200px;
+    flex-shrink: 0;
+    pointer-events: auto;
+    padding-bottom: 10px;
+    align-self: flex-end;
+  }
+
+  .act-row {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Botão correr — mais compacto */
+  .btn-run {
+    width: 90px;
+    height: 36px;
+    font-size: 9px;
+    border-radius: 18px;
+  }
+
+  /* Coletar */
+  .btn-interact {
+    width: 52px;
+    height: 52px;
+    font-size: 8px;
+  }
+
+  /* Recarregar e Inventário */
+  .btn-reload,
+  .btn-inventory {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  /* Lanterna */
+  .btn-battery {
+    width: 90px;
+    height: 36px;
+    font-size: 9px;
+  }
+
+  /* ── JOYSTICK MIRA DIREITO — menor em landscape */
+  #aim-zone {
+    width: 130px;
+    height: 130px;
+    flex-shrink: 0;
+    pointer-events: auto;
+    touch-action: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+
+  #aim-base {
+    width: 108px;
+    height: 108px;
+  }
+
+  #aim-knob {
+    width: 44px;
+    height: 44px;
+  }
+
+  .aim-label {
+    font-size: 7px;
+    margin-bottom: 3px;
+  }
+}
