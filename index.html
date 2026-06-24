@@ -293,11 +293,43 @@
   </div>
 
   <script src="script.js"></script>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CONTROLES MOBILE — apenas visível em touch devices
+  ═══════════════════════════════════════════════════════════ -->
   <div id="mobile-controls">
-    <button id="btn-up">▲</button>
-    <button id="btn-left">◀</button>
-    <button id="btn-right">▶</button>
-    <button id="btn-down">▼</button>
-</div>
-</body>
-</html>
+    <!-- Joystick analógico virtual (canto inferior esquerdo) -->
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+
+    <!-- Botões de ação (canto inferior direito) -->
+    <div id="action-buttons">
+      <div id="action-row-top">
+        <button class="action-btn btn-reload" id="mb-reload" title="Recarregar [R]">
+          <span class="ab-icon">⟳</span>
+          <span class="ab-label">RECAR</span>
+        </button>
+        <button class="action-btn btn-flashlight" id="mb-flashlight" title="Lanterna [F]">
+          <span class="ab-icon">🔦</span>
+          <span class="ab-label">LANT</span>
+        </button>
+        <button class="action-btn btn-interact" id="mb-interact" title="Interagir [E]">
+          <span class="ab-icon">⬡</span>
+          <span class="ab-label">USAR</span>
+        </button>
+      </div>
+      <div id="action-row-bottom">
+        <button class="action-btn btn-run" id="mb-run" title="Correr [Shift]">
+          <span class="ab-icon">▶▶</span>
+          <span class="ab-label">CORRER</span>
+        </button>
+        <button class="action-btn btn-shoot" id="mb-shoot" title="Atirar [Click]">
+          <span class="ab-icon">🎯</span>
+          <span class="ab-label">ATIRAR</span>
+        </button>
+      </div>
+    </div>
+  </div>
