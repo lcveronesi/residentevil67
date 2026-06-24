@@ -294,42 +294,32 @@
 
   <script src="script.js"></script>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       CONTROLES MOBILE — apenas visível em touch devices
-  ═══════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════
+       CONTROLES MOBILE
+  ═══════════════════════════════════════════ -->
   <div id="mobile-controls">
-    <!-- Joystick analógico virtual (canto inferior esquerdo) -->
+    <!-- Joystick esquerdo (movimento) -->
     <div id="joystick-zone">
       <div id="joystick-base">
         <div id="joystick-knob"></div>
       </div>
     </div>
 
-    <!-- Botões de ação (canto inferior direito) -->
+    <!-- Botões de ação direita -->
     <div id="action-buttons">
       <div id="action-row-top">
-        <button class="action-btn btn-reload" id="mb-reload" title="Recarregar [R]">
-          <span class="ab-icon">⟳</span>
-          <span class="ab-label">RECAR</span>
-        </button>
-        <button class="action-btn btn-flashlight" id="mb-flashlight" title="Lanterna [F]">
-          <span class="ab-icon">🔦</span>
-          <span class="ab-label">LANT</span>
-        </button>
-        <button class="action-btn btn-interact" id="mb-interact" title="Interagir [E]">
-          <span class="ab-icon">⬡</span>
-          <span class="ab-label">USAR</span>
-        </button>
+        <button class="action-btn btn-run"      id="mob-run">🏃 CORRER</button>
       </div>
-      <div id="action-row-bottom">
-        <button class="action-btn btn-run" id="mb-run" title="Correr [Shift]">
-          <span class="ab-icon">▶▶</span>
-          <span class="ab-label">CORRER</span>
-        </button>
-        <button class="action-btn btn-shoot" id="mb-shoot" title="Atirar [Click]">
-          <span class="ab-icon">🎯</span>
-          <span class="ab-label">ATIRAR</span>
-        </button>
+      <div id="action-row-mid">
+        <button class="action-btn btn-interact"  id="mob-interact">⚡ COLETAR</button>
+        <button class="action-btn btn-shoot"     id="mob-shoot">🔫 ATIRAR</button>
+      </div>
+      <div id="action-row-bot">
+        <button class="action-btn btn-reload"    id="mob-reload">🔄 RECARREGAR</button>
+        <button class="action-btn btn-inventory" id="mob-inventory">🎒 INVENTÁRIO</button>
       </div>
     </div>
   </div>
+
+</body>
+</html>
