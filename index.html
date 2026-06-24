@@ -296,26 +296,38 @@
 
   <!-- CONTROLES MOBILE -->
   <div id="mobile-controls">
-    <!-- Joystick esquerdo -->
+
+    <!-- JOYSTICK ESQUERDO — movimento -->
     <div id="joystick-zone">
       <div id="joystick-base">
         <div id="joystick-knob"></div>
       </div>
     </div>
-    <!-- Botões direita -->
+
+    <!-- CENTRO — botões de ação rápida -->
     <div id="action-buttons">
       <div class="act-row">
         <button class="act-btn btn-run"       id="mob-run">🏃 CORRER</button>
       </div>
       <div class="act-row">
         <button class="act-btn btn-interact"  id="mob-interact">⚡ COLETAR</button>
-        <button class="act-btn btn-shoot"     id="mob-shoot">🔫</button>
+        <button class="act-btn btn-reload"    id="mob-reload">🔄</button>
       </div>
       <div class="act-row">
-        <button class="act-btn btn-reload"    id="mob-reload">🔄 RECARR.</button>
-        <button class="act-btn btn-inventory" id="mob-inventory">🎒 INV.</button>
+        <button class="act-btn btn-battery"   id="mob-battery">🔋 LANTERNA</button>
+        <button class="act-btn btn-inventory" id="mob-inventory">🎒</button>
       </div>
     </div>
+
+    <!-- JOYSTICK DIREITO — mira e tiro -->
+    <div id="aim-zone">
+      <div class="aim-label">MIRA / TIRO</div>
+      <div id="aim-base">
+        <div id="aim-knob"></div>
+        <div class="aim-center-dot"></div>
+      </div>
+    </div>
+
   </div>
 
   <script src="script.js"></script>
