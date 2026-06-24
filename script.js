@@ -2035,6 +2035,8 @@ function startNewGame() {
   Audio.init();
   Audio.playAmbient();
   Screens.show('screen-game');
+  // Exibe controles mobile quando o jogo começa
+  document.getElementById('mobile-controls').classList.add('game-active');
   updateHUD();
   $('objective-hint').textContent = getObjective();
   showNotification('USE WASD + MOUSE. [E] INTERAGIR. [TAB] INVENTÁRIO.', 4000);
@@ -2160,6 +2162,7 @@ function setupUIButtons() {
     if (rafId) cancelAnimationFrame(rafId);
     Audio.stopAmbient();
     Screens.hideOverlay('screen-pause');
+    document.getElementById('mobile-controls').classList.remove('game-active');
     Screens.show('screen-title');
   });
 
@@ -2170,12 +2173,14 @@ function setupUIButtons() {
   });
   $('btn-gameover-menu').addEventListener('click', () => {
     Audio.stopAmbient();
+    document.getElementById('mobile-controls').classList.remove('game-active');
     Screens.show('screen-title');
   });
 
   // ── Vitória
   $('btn-victory-menu').addEventListener('click', () => {
     Audio.stopAmbient();
+    document.getElementById('mobile-controls').classList.remove('game-active');
     Screens.show('screen-title');
   });
 
