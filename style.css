@@ -869,8 +869,8 @@ kbd {
     overflow: hidden;
   }
 
-  /* CRITICO: exibe os controles em dispositivos touch */
-  #mobile-controls {
+  /* Controles só aparecem quando o jogo está ativo (classe adicionada via JS) */
+  #mobile-controls.game-active {
     display: flex !important;
   }
 
@@ -1099,13 +1099,34 @@ kbd {
     box-shadow: 0 0 30px rgba(231,76,60,0.7), inset 0 0 20px rgba(100,0,0,0.3);
   }
 
-  /* Centro — botões de ação */
+  /* Centro — botões de ação (só RUN + INTERACT + BATTERY) */
   #action-buttons {
     display: flex; flex-direction: column;
-    gap: 10px; align-items: center;
+    gap: 8px; align-items: center;
     flex-shrink: 0;
     pointer-events: auto;
     padding-bottom: 4px;
+  }
+
+  /* Zona direita — joystick de mira + botões empilhados acima */
+  #aim-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+    pointer-events: auto;
+    touch-action: none;
+  }
+
+  /* Botões empilhados acima do joystick de mira */
+  #aim-side-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    pointer-events: auto;
   }
 }
 
@@ -1166,18 +1187,25 @@ kbd {
     height: 44px;
   }
 
-  /* ── BOTÕES DE AÇÃO CENTRAIS — coluna compacta no centro-esquerdo */
+  /* ── BOTÕES DE AÇÃO CENTRAIS — coluna compacta no centro */
   #action-buttons {
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 6px;
-    align-items: flex-end;
-    justify-content: center;
-    max-width: 200px;
+    align-items: center;
+    justify-content: flex-end;
+    max-width: 160px;
     flex-shrink: 0;
     pointer-events: auto;
     padding-bottom: 10px;
     align-self: flex-end;
+  }
+
+  #aim-side-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: center;
   }
 
   .act-row {
