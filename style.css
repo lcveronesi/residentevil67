@@ -865,8 +865,13 @@ kbd {
 
   html, body {
     cursor: default;
-    touch-action: none;     /* Impede scroll e gestos do sistema */
+    touch-action: none;
     overflow: hidden;
+  }
+
+  /* CRITICO: exibe os controles em dispositivos touch */
+  #mobile-controls {
+    display: flex !important;
   }
 
   #crosshair  { display: none !important; }
