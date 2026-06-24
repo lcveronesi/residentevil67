@@ -1273,3 +1273,71 @@ kbd {
     margin-bottom: 3px;
   }
 }
+/* ═══════════════════════════════════════════════════════════
+   MOBILE — BOTÕES NAS LATERAIS (sem centro)
+═══════════════════════════════════════════════════════════ */
+@media (pointer: coarse) {
+
+  /* Remove o bloco central — não existe mais */
+  #action-buttons { display: none !important; }
+
+  /* Joystick esquerdo vira coluna: botões em cima, joystick embaixo */
+  #joystick-zone {
+    width: auto !important;
+    height: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px;
+  }
+
+  /* Botões acima do joystick esquerdo */
+  #left-side-btns {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    pointer-events: auto;
+  }
+
+  /* Botões compactos — só emoji, sem texto */
+  #left-side-btns .act-btn,
+  #aim-side-btns .act-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    font-size: 22px;
+  }
+
+  #left-side-btns .btn-run {
+    background: linear-gradient(135deg, #636e72, #2d3436);
+    border: 1px solid #95a5a6;
+  }
+  #left-side-btns .btn-run.active-run {
+    background: linear-gradient(135deg, #e67e22, #a04000);
+    border-color: #f39c12;
+  }
+  #left-side-btns .btn-interact {
+    background: radial-gradient(circle at 38% 35%, #27ae60, #0d3b22);
+    border: 2px solid #2ecc71;
+  }
+
+  #aim-side-btns .btn-battery {
+    background: linear-gradient(135deg, #e67e22, #7d3900);
+    border: 1px solid #f39c12;
+  }
+  #aim-side-btns .btn-reload {
+    background: linear-gradient(135deg, #2980b9, #0d2d40);
+    border: 1px solid #3498db;
+  }
+  #aim-side-btns .btn-inventory {
+    background: linear-gradient(135deg, #8e44ad, #3b1052);
+    border: 1px solid #9b59b6;
+  }
+
+  /* mobile-controls fica na base, sem centro */
+  #mobile-controls {
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    padding-bottom: env(safe-area-inset-bottom, 14px) !important;
+  }
+}
