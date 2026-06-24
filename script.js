@@ -2420,14 +2420,7 @@ if (document.readyState === 'loading') {
     }
   });
 
-  /* ── Exibe os controles mobile apenas na tela de jogo ────── */
-  const mobileControls = document.getElementById('mobile-controls');
-  const observer = new MutationObserver(() => {
-    const gameScreen = document.getElementById('screen-game');
-    if (mobileControls && gameScreen) {
-      mobileControls.style.display = gameScreen.classList.contains('active') ? 'flex' : 'none';
-    }
-  });
-  observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
+  /* Controles mobile: CSS já define display:flex via @media (pointer:coarse).
+     Nenhum JS adicional necessário para exibição. */
 
 }());
