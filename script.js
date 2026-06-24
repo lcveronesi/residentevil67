@@ -745,6 +745,12 @@ function updateHUD() {
   // Lanterna
   $('flashlight-bar').style.width = clamp(Game.flashlight.battery, 0, 100) + '%';
 
+  // Pisca o botão de bateria mobile quando lanterna está fraca
+  if (window._isMobile) {
+    const bBtn = document.getElementById('mob-battery');
+    if (bBtn) bBtn.classList.toggle('low', Game.flashlight.battery < 25);
+  }
+
   // Chaves
   $('slot-blue').classList.toggle('obtained', Game.keys.blue);
   $('slot-red').classList.toggle('obtained',  Game.keys.red);
@@ -2205,12 +2211,11 @@ if (document.readyState === 'loading') {
   init();
 }
 /* ─────────────────────────────────────────────────────────────────
-   CONTROLES MOBILE — Joystick analógico + botões de ação
-   VERSÃO CORRIGIDA:
-   - Joystick recalcula centro a cada touchstart (corrige drift)
-   - touch-action:none no canvas e body para evitar interferência
-   - Botões usam pointer events + touch events para máxima compatibilidade
-   - Mira automática no inimigo mais próximo ao atirar
+   CONTROLES MOBILE — Twin-stick completo
+   · Joystick ESQUERDO → movimento (WASD)
+   · Joystick DIREITO  → mira contínua; soltar o dedo = atirar
+   · Botão 🔋 rápido   → usa bateria sem abrir inventário
+   · Botão [F] rápido  → usa kit médico sem abrir inventário
 ───────────────────────────────────────────────────────────────── */
 (function () {
   const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
@@ -2218,128 +2223,171 @@ if (document.readyState === 'loading') {
 
   window._isMobile = true;
 
-  // Impede que o body e canvas gerem scroll ou gestos durante o jogo
-  document.body.style.touchAction  = 'none';
-  document.body.style.overflow     = 'hidden';
-  document.body.style.userSelect   = 'none';
+  document.body.style.touchAction      = 'none';
+  document.body.style.overflow         = 'hidden';
+  document.body.style.userSelect       = 'none';
   document.body.style.webkitUserSelect = 'none';
 
-  /* ── Joystick ─────────────────────────────────────────────── */
-  const RADIUS = 52;   // raio máximo do knob em pixels
-  const DEAD   = 0.18; // zona morta (18%)
+  const RADIUS = 54;
+  const DEAD   = 0.16;
 
-  let joyActive = false;
-  let joyId     = null;
-  let joyOrigX  = 0;
-  let joyOrigY  = 0;
+  /* ════════════════════════════════════════════════════════════
+     JOYSTICK ESQUERDO — movimento
+  ════════════════════════════════════════════════════════════ */
+  let joyActive = false, joyId = null, joyOrigX = 0, joyOrigY = 0;
 
-  const base = document.getElementById('joystick-base');
-  const knob = document.getElementById('joystick-knob');
-  const zone = document.getElementById('joystick-zone');
+  const moveBase   = document.getElementById('joystick-base');
+  const moveKnobEl = document.getElementById('joystick-knob');
+  const moveZone   = document.getElementById('joystick-zone');
 
-  function moveKnob(dx, dy) {
-    if (knob) knob.style.transform = `translate(${dx}px, ${dy}px)`;
+  function setMoveKnob(dx, dy) {
+    if (moveKnobEl) moveKnobEl.style.transform = `translate(${dx}px,${dy}px)`;
   }
-
   function applyMovement(dx, dy) {
-    const nx = dx / RADIUS;
-    const ny = dy / RADIUS;
-    // Aplica movimento nas 4 direções com zona morta
+    const nx = dx / RADIUS, ny = dy / RADIUS;
     if (ny < -DEAD) Game.keys_held['KeyW'] = true; else delete Game.keys_held['KeyW'];
     if (ny >  DEAD) Game.keys_held['KeyS'] = true; else delete Game.keys_held['KeyS'];
     if (nx < -DEAD) Game.keys_held['KeyA'] = true; else delete Game.keys_held['KeyA'];
     if (nx >  DEAD) Game.keys_held['KeyD'] = true; else delete Game.keys_held['KeyD'];
   }
-
-  function stopJoy() {
-    joyActive = false;
-    joyId     = null;
-    moveKnob(0, 0);
-    delete Game.keys_held['KeyW'];
-    delete Game.keys_held['KeyS'];
-    delete Game.keys_held['KeyA'];
-    delete Game.keys_held['KeyD'];
+  function stopMove() {
+    joyActive = false; joyId = null;
+    setMoveKnob(0, 0);
+    ['KeyW','KeyS','KeyA','KeyD'].forEach(k => delete Game.keys_held[k]);
   }
 
-  // Detecta se o toque está dentro da zona do joystick
-  function isTouchInJoystickZone(clientX, clientY) {
-    if (!zone) return false;
-    const r = zone.getBoundingClientRect();
-    return clientX >= r.left && clientX <= r.right &&
-           clientY >= r.top  && clientY <= r.bottom;
+  /* ════════════════════════════════════════════════════════════
+     JOYSTICK DIREITO — mira contínua + tiro ao soltar
+  ════════════════════════════════════════════════════════════ */
+  let aimActive = false, aimId = null, aimOrigX = 0, aimOrigY = 0;
+  let aimDirX = 0, aimDirY = -1; // direção padrão: cima
+
+  const aimBase   = document.getElementById('aim-base');
+  const aimKnobEl = document.getElementById('aim-knob');
+  const aimZone   = document.getElementById('aim-zone');
+
+  function setAimKnob(dx, dy) {
+    if (aimKnobEl) aimKnobEl.style.transform = `translate(${dx}px,${dy}px)`;
   }
 
-  // touchstart: recalcula o centro do joystick-base em tempo real
+  // Atualiza Game.mouse conforme direção do joystick de mira
+  function applyAim(dx, dy) {
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas || !Game.player) return;
+    const len = Math.hypot(dx, dy);
+    if (len > DEAD * RADIUS) {
+      aimDirX = dx / len;
+      aimDirY = dy / len;
+    }
+    // Projeta 600px na direção da mira a partir do centro da tela (câmera)
+    Game.mouse.x = canvas.width  / 2 + aimDirX * 600;
+    Game.mouse.y = canvas.height / 2 + aimDirY * 600;
+  }
+
+  function doShoot() {
+    if (!canAct()) return;
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas) return;
+    // Garante que a mira está na posição correta antes de atirar
+    Game.mouse.x = canvas.width  / 2 + aimDirX * 600;
+    Game.mouse.y = canvas.height / 2 + aimDirY * 600;
+    shoot();
+    // Feedback visual: pisca a borda do joystick de mira
+    if (aimBase) {
+      aimBase.classList.add('firing');
+      setTimeout(() => aimBase.classList.remove('firing'), 130);
+    }
+  }
+
+  function stopAim(shouldShoot) {
+    aimActive = false; aimId = null;
+    setAimKnob(0, 0);
+    if (shouldShoot) doShoot();
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     HELPER — verifica se ponto está dentro de um elemento
+  ════════════════════════════════════════════════════════════ */
+  function inZone(el, cx, cy) {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    // Margem de 10px para facilitar o toque nas bordas
+    return cx >= r.left - 10 && cx <= r.right  + 10 &&
+           cy >= r.top  - 10 && cy <= r.bottom + 10;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     EVENTOS DE TOQUE UNIFICADOS
+  ════════════════════════════════════════════════════════════ */
   document.addEventListener('touchstart', (e) => {
     for (let i = 0; i < e.changedTouches.length; i++) {
       const t = e.changedTouches[i];
 
-      if (isTouchInJoystickZone(t.clientX, t.clientY)) {
-        if (joyActive) continue;
-        joyActive = true;
-        joyId     = t.identifier;
-        // CRÍTICO: recalcula o centro do base a cada novo toque
-        const r  = base.getBoundingClientRect();
+      // Joystick de movimento (esquerdo)
+      if (!joyActive && inZone(moveZone, t.clientX, t.clientY)) {
+        joyActive = true; joyId = t.identifier;
+        const r  = moveBase.getBoundingClientRect();
         joyOrigX = r.left + r.width  / 2;
         joyOrigY = r.top  + r.height / 2;
         e.preventDefault();
-        break;
+        continue;
+      }
+
+      // Joystick de mira (direito)
+      if (!aimActive && inZone(aimZone, t.clientX, t.clientY)) {
+        aimActive = true; aimId = t.identifier;
+        const r  = aimBase.getBoundingClientRect();
+        aimOrigX = r.left + r.width  / 2;
+        aimOrigY = r.top  + r.height / 2;
+        e.preventDefault();
+        continue;
       }
     }
   }, { passive: false });
 
-  // touchmove: rastreia o dedo em qualquer lugar da tela
   document.addEventListener('touchmove', (e) => {
-    if (!joyActive) return;
     for (let i = 0; i < e.changedTouches.length; i++) {
       const t = e.changedTouches[i];
-      if (t.identifier !== joyId) continue;
-      let dx  = t.clientX - joyOrigX;
-      let dy  = t.clientY - joyOrigY;
-      const len = Math.hypot(dx, dy);
-      if (len > RADIUS) { dx = (dx / len) * RADIUS; dy = (dy / len) * RADIUS; }
-      moveKnob(dx, dy);
-      applyMovement(dx, dy);
-      e.preventDefault();
-      break;
+
+      if (joyActive && t.identifier === joyId) {
+        let dx = t.clientX - joyOrigX, dy = t.clientY - joyOrigY;
+        const len = Math.hypot(dx, dy);
+        if (len > RADIUS) { dx = dx/len*RADIUS; dy = dy/len*RADIUS; }
+        setMoveKnob(dx, dy);
+        applyMovement(dx, dy);
+        e.preventDefault();
+      }
+
+      if (aimActive && t.identifier === aimId) {
+        let dx = t.clientX - aimOrigX, dy = t.clientY - aimOrigY;
+        const len = Math.hypot(dx, dy);
+        if (len > RADIUS) { dx = dx/len*RADIUS; dy = dy/len*RADIUS; }
+        setAimKnob(dx, dy);
+        applyAim(dx, dy);
+        e.preventDefault();
+      }
     }
   }, { passive: false });
 
   document.addEventListener('touchend', (e) => {
-    if (!joyActive) return;
     for (let i = 0; i < e.changedTouches.length; i++) {
-      if (e.changedTouches[i].identifier === joyId) { stopJoy(); break; }
+      const t = e.changedTouches[i];
+      if (joyActive && t.identifier === joyId) stopMove();
+      if (aimActive && t.identifier === aimId) stopAim(true); // atira ao soltar
     }
   }, { passive: false });
 
-  document.addEventListener('touchcancel', () => { if (joyActive) stopJoy(); }, { passive: false });
-
-  /* ── Mira automática (sem mouse no mobile) ────────────────── */
-  function aimNearest() {
-    if (!Game || !Game.enemies || !Game.player) return;
-    const canvas = document.getElementById('gameCanvas');
-    if (!canvas) return;
-    const W = canvas.width, H = canvas.height;
-    const p = Game.player;
-    let nearest = null, best = Infinity;
-    for (const en of Game.enemies) {
-      if (en.dead) continue;
-      const d = Math.hypot(en.x - p.x, en.y - p.y);
-      if (d < best) { best = d; nearest = en; }
+  document.addEventListener('touchcancel', (e) => {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const t = e.changedTouches[i];
+      if (joyActive && t.identifier === joyId) stopMove();
+      if (aimActive && t.identifier === aimId) stopAim(false); // cancelado: não atira
     }
-    const camX = p.x - W / 2;
-    const camY = p.y - H / 2;
-    if (nearest) {
-      Game.mouse.x = nearest.x - camX;
-      Game.mouse.y = nearest.y - camY;
-    } else {
-      // Sem inimigo: mira à frente (topo do canvas)
-      Game.mouse.x = W / 2;
-      Game.mouse.y = H / 2 - 100;
-    }
-  }
+  }, { passive: false });
 
-  /* ── Verifica se o jogo aceita ações agora ────────────────── */
+  /* ════════════════════════════════════════════════════════════
+     ESTADO DO JOGO
+  ════════════════════════════════════════════════════════════ */
   function canAct() {
     return Game.running && !Game.paused && !Game.over && !Game.victory &&
       !Screens.isOverlayOpen('screen-inventory') &&
@@ -2348,35 +2396,26 @@ if (document.readyState === 'loading') {
       !Screens.isOverlayOpen('screen-pause');
   }
 
-  /* ── Helper: adiciona touchstart + click como fallback ───── */
-  function addActionBtn(id, fn) {
+  /* ════════════════════════════════════════════════════════════
+     HELPER — botões com touchstart + fallback click
+  ════════════════════════════════════════════════════════════ */
+  function addBtn(id, fn) {
     const btn = document.getElementById(id);
     if (!btn) return;
     let touched = false;
     btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      touched = true;
-      fn(btn, e);
+      e.preventDefault(); e.stopPropagation();
+      touched = true; fn(btn);
     }, { passive: false });
-    btn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-    }, { passive: false });
-    // Fallback click (para emuladores e navegadores que não disparam touchstart)
-    btn.addEventListener('click', (e) => {
-      if (touched) { touched = false; return; }
-      fn(btn, e);
-    });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); }, { passive: false });
+    btn.addEventListener('click', () => { if (touched) { touched = false; return; } fn(btn); });
   }
 
-  /* ── Botão ATIRAR ─────────────────────────────────────────── */
-  addActionBtn('mob-shoot', () => {
-    if (!canAct()) return;
-    aimNearest();
-    shoot();
-  });
+  /* ════════════════════════════════════════════════════════════
+     BOTÕES DE AÇÃO
+  ════════════════════════════════════════════════════════════ */
 
-  /* ── Botão CORRER ─────────────────────────────────────────── */
+  // CORRER — segurar ativa, soltar desativa
   const btnRun = document.getElementById('mob-run');
   if (btnRun) {
     btnRun.addEventListener('touchstart', (e) => {
@@ -2384,7 +2423,7 @@ if (document.readyState === 'loading') {
       Game.keys_held['ShiftLeft'] = true;
       btnRun.classList.add('active-run');
     }, { passive: false });
-    ['touchend', 'touchcancel'].forEach(ev =>
+    ['touchend','touchcancel'].forEach(ev =>
       btnRun.addEventListener(ev, (e) => {
         e.preventDefault();
         delete Game.keys_held['ShiftLeft'];
@@ -2393,34 +2432,39 @@ if (document.readyState === 'loading') {
     );
   }
 
-  /* ── Botão COLETAR / INTERAGIR ───────────────────────────── */
-  addActionBtn('mob-interact', () => {
-    if (!canAct()) return;
-    interact();
-  });
+  // COLETAR / INTERAGIR
+  addBtn('mob-interact', () => { if (canAct()) interact(); });
 
-  /* ── Botão RECARREGAR ────────────────────────────────────── */
-  addActionBtn('mob-reload', () => {
-    if (!canAct()) return;
-    startReload();
-  });
+  // RECARREGAR
+  addBtn('mob-reload', () => { if (canAct()) startReload(); });
 
-  /* ── Botão INVENTÁRIO ────────────────────────────────────── */
-  addActionBtn('mob-inventory', () => {
-    if (!Game.running || Game.over || Game.victory) return;
-    if (Screens.isOverlayOpen('screen-inventory')) {
-      Screens.hideOverlay('screen-inventory');
-      resumeGameLogic();
-    } else if (!Screens.isOverlayOpen('screen-puzzle') &&
-               !Screens.isOverlayOpen('screen-document') &&
-               !Screens.isOverlayOpen('screen-pause')) {
-      renderInventoryUI();
-      pauseGameLogic();
-      Screens.showOverlay('screen-inventory');
+  // BATERIA — usa bateria do inventário diretamente, sem abrir inventário
+  addBtn('mob-battery', () => {
+    if (!canAct()) return;
+    const idx = Game.inventory.findIndex(s => s.itemId === 'battery');
+    if (idx >= 0) {
+      if (Game.flashlight.battery >= 100) {
+        showNotification('LANTERNA JÁ ESTÁ CHEIA!');
+        return;
+      }
+      Game.inspectedSlot = idx;
+      useItem(idx);
+    } else {
+      showNotification('SEM BATERIAS NO INVENTÁRIO!');
     }
   });
 
-  /* Controles mobile: CSS já define display:flex via @media (pointer:coarse).
-     Nenhum JS adicional necessário para exibição. */
+  // INVENTÁRIO
+  addBtn('mob-inventory', () => {
+    if (!Game.running || Game.over || Game.victory) return;
+    if (Screens.isOverlayOpen('screen-inventory')) {
+      Screens.hideOverlay('screen-inventory'); resumeGameLogic();
+    } else if (!Screens.isOverlayOpen('screen-puzzle') &&
+               !Screens.isOverlayOpen('screen-document') &&
+               !Screens.isOverlayOpen('screen-pause')) {
+      renderInventoryUI(); pauseGameLogic();
+      Screens.showOverlay('screen-inventory');
+    }
+  });
 
 }());
