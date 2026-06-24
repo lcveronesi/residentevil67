@@ -842,47 +842,284 @@ kbd {
 #gameCanvas.shake {
   animation: cameraShake 0.35s ease-out;
 }
-/* CONTROLES MOBILE */
+/* ═══════════════════════════════════════════════════════════
+   CONTROLES MOBILE — SISTEMA COMPLETO
+   Visível apenas em dispositivos touch
+═══════════════════════════════════════════════════════════ */
 
-#mobile-controls{
-    display:none;
+#mobile-controls {
+  display: none; /* oculto por padrão no PC */
+  position: fixed;
+  inset: 0;
+  pointer-events: none; /* o container não bloqueia o jogo */
+  z-index: 200;
 }
 
-@media (max-width:900px){
+/* ── Zona do Joystick (canto inferior esquerdo) ─────── */
+#joystick-zone {
+  position: absolute;
+  left: 16px;
+  bottom: 24px;
+  width: 140px;
+  height: 140px;
+  pointer-events: all;
+  touch-action: none;
+}
 
-    #mobile-controls{
-        display:flex;
-        position:fixed;
-        left:15px;
-        bottom:15px;
-        width:140px;
-        flex-wrap:wrap;
-        gap:8px;
-        z-index:9999;
-    }
+#joystick-base {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(8, 8, 12, 0.70);
+  border: 2px solid rgba(139, 0, 0, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(192, 57, 43, 0.18),
+    0 0 20px rgba(0, 0, 0, 0.7),
+    inset 0 0 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    #mobile-controls button{
-        width:60px;
-        height:60px;
-        font-size:24px;
-        border:none;
-        border-radius:10px;
-        background:#222;
-        color:white;
-    }
+/* Marcadores de direção sutis */
+#joystick-base::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  border: 1px dashed rgba(139, 0, 0, 0.22);
+}
 
-    #crosshair{
-        display:none;
-    }
+#joystick-knob {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%,
+    rgba(192, 57, 43, 0.85),
+    rgba(100, 10, 10, 0.95));
+  border: 2px solid rgba(220, 80, 60, 0.7);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(139, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 120, 100, 0.3);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: box-shadow 0.1s;
+  pointer-events: none;
+}
 
-    #hud{
-        transform:scale(0.8);
-        transform-origin:top left;
-    }
+#joystick-knob.active {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.9),
+    0 0 24px rgba(192, 57, 43, 0.7),
+    inset 0 1px 3px rgba(255, 120, 100, 0.4);
+}
 
-    canvas{
-        width:100vw !important;
-        height:100vh !important;
-    }
+/* ── Botões de Ação (canto inferior direito) ─────────── */
+#action-buttons {
+  position: absolute;
+  right: 16px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  pointer-events: all;
+  touch-action: none;
+}
 
+#action-row-top,
+#action-row-bottom {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Botão de ação base */
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-horror);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.08s, box-shadow 0.08s, background 0.08s;
+  /* Evita delay de 300ms em mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:active,
+.action-btn.pressed {
+  transform: scale(0.90);
+}
+
+.ab-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ab-label {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  opacity: 0.8;
+}
+
+/* ── Variante: Atirar (grande, destaque) */
+.btn-shoot {
+  width: 72px;
+  height: 72px;
+  background: rgba(139, 0, 0, 0.65);
+  border: 2px solid rgba(192, 57, 43, 0.8);
+  color: #fff;
+  box-shadow:
+    0 0 20px rgba(139, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 100, 80, 0.2);
+}
+.btn-shoot .ab-icon { font-size: 26px; }
+.btn-shoot:active,
+.btn-shoot.pressed {
+  background: rgba(192, 57, 43, 0.85);
+  box-shadow: 0 0 30px rgba(192, 57, 43, 0.8), 0 2px 6px rgba(0,0,0,0.9);
+}
+
+/* ── Variante: Correr */
+.btn-run {
+  width: 62px;
+  height: 62px;
+  background: rgba(243, 156, 18, 0.45);
+  border: 2px solid rgba(243, 156, 18, 0.65);
+  color: #f4c766;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 220, 100, 0.15);
+}
+.btn-run.pressed,
+.btn-run.active-run {
+  background: rgba(243, 156, 18, 0.75);
+  box-shadow: 0 0 20px rgba(243, 156, 18, 0.5), 0 2px 6px rgba(0,0,0,0.8);
+  transform: scale(0.92);
+}
+
+/* ── Variante: Interagir */
+.btn-interact {
+  width: 56px;
+  height: 56px;
+  background: rgba(52, 152, 219, 0.45);
+  border: 2px solid rgba(52, 152, 219, 0.65);
+  color: #7ec8e3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+.btn-interact:active,
+.btn-interact.pressed {
+  background: rgba(52, 152, 219, 0.75);
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+}
+
+/* ── Variante: Recarregar */
+.btn-reload {
+  width: 56px;
+  height: 56px;
+  background: rgba(46, 204, 113, 0.38);
+  border: 2px solid rgba(46, 204, 113, 0.58);
+  color: #7eebb0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+.btn-reload:active,
+.btn-reload.pressed {
+  background: rgba(46, 204, 113, 0.65);
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+}
+
+/* ── Variante: Lanterna */
+.btn-flashlight {
+  width: 56px;
+  height: 56px;
+  background: rgba(232, 192, 106, 0.35);
+  border: 2px solid rgba(232, 192, 106, 0.55);
+  color: #f0d080;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+.btn-flashlight:active,
+.btn-flashlight.pressed {
+  background: rgba(232, 192, 106, 0.65);
+  box-shadow: 0 0 20px rgba(232, 192, 106, 0.5);
+}
+
+/* ── Ativar controles mobile via JS (classe no body) */
+body.touch-device #mobile-controls {
+  display: block;
+}
+
+/* ── Esconde crosshair em touch (mira é automática) */
+body.touch-device #crosshair {
+  display: none;
+}
+
+/* ── Ajustes de HUD em mobile */
+body.touch-device #hud {
+  padding: 10px 12px;
+}
+
+body.touch-device #hud-left {
+  min-width: 120px;
+}
+
+body.touch-device #health-bar-bg,
+body.touch-device #stamina-bar-bg,
+body.touch-device #flashlight-bar-bg {
+  width: 100px;
+}
+
+body.touch-device #hud-right {
+  min-width: 110px;
+}
+
+/* HUD de chaves sobem para não colidir com botões */
+body.touch-device #hud-keys {
+  bottom: auto;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Prompt de interação sobe acima dos botões */
+body.touch-device #interact-prompt {
+  bottom: 185px;
+}
+
+/* Notificação desce um pouco */
+body.touch-device #notification {
+  top: 12px;
+}
+
+/* Canvas ocupa tela toda */
+body.touch-device canvas {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+/* ── Responsividade para telas muito pequenas */
+@media (max-width: 380px) {
+  #joystick-zone { width: 120px; height: 120px; }
+  .btn-shoot  { width: 62px; height: 62px; }
+  .btn-run    { width: 54px; height: 54px; }
+  .btn-interact, .btn-reload, .btn-flashlight { width: 48px; height: 48px; }
+  .ab-icon    { font-size: 18px; }
+}
+
+@media (max-height: 600px) {
+  #joystick-zone  { bottom: 10px; }
+  #action-buttons { bottom: 10px; }
+  .btn-shoot  { width: 60px; height: 60px; }
+  .btn-run    { width: 52px; height: 52px; }
+  .btn-interact, .btn-reload, .btn-flashlight { width: 46px; height: 46px; }
 }
