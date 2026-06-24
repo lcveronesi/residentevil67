@@ -994,13 +994,117 @@ kbd {
     box-shadow: 0 0 12px rgba(52,152,219,0.35), 0 4px 14px rgba(0,0,0,0.7);
   }
 
-  /* Inventário */
+  /* Recarregar e Inventário — compactos no centro */
+  .btn-reload,
   .btn-inventory {
-    width: 88px; height: 42px;
-    border-radius: 10px; font-size: 10px;
-    flex-direction: column; gap: 2px;
+    width: 52px; height: 52px;
+    border-radius: 50%; font-size: 18px;
+    flex-direction: column; gap: 0;
+  }
+  .btn-reload {
+    background: linear-gradient(135deg, #2980b9, #0d2d40);
+    border: 1px solid #3498db;
+    box-shadow: 0 0 10px rgba(52,152,219,0.35), 0 4px 14px rgba(0,0,0,0.7);
+  }
+  .btn-inventory {
     background: linear-gradient(135deg, #8e44ad, #3b1052);
     border: 1px solid #9b59b6;
-    box-shadow: 0 0 12px rgba(155,89,182,0.35), 0 4px 14px rgba(0,0,0,0.7);
+    box-shadow: 0 0 10px rgba(155,89,182,0.35), 0 4px 14px rgba(0,0,0,0.7);
+  }
+
+  /* Bateria — laranja, usa bateria na lanterna sem abrir inventário */
+  .btn-battery {
+    width: 114px; height: 42px;
+    border-radius: 10px; font-size: 10px; letter-spacing: 0.5px;
+    gap: 4px;
+    background: linear-gradient(135deg, #e67e22, #7d3900);
+    border: 1px solid #f39c12;
+    box-shadow: 0 0 10px rgba(243,156,18,0.35), 0 4px 14px rgba(0,0,0,0.7);
+  }
+  .btn-battery.low {
+    animation: batteryLow 0.8s ease-in-out infinite;
+  }
+  @keyframes batteryLow {
+    0%, 100% { box-shadow: 0 0 10px rgba(243,156,18,0.35), 0 4px 14px rgba(0,0,0,0.7); }
+    50%       { box-shadow: 0 0 24px rgba(243,156,18,1.0), 0 4px 14px rgba(0,0,0,0.7); border-color: #ffe066; }
+  }
+
+  /* ══ JOYSTICK DE MIRA (direito) ════════════════════════════ */
+  #aim-zone {
+    width: 160px; height: 160px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    flex-shrink: 0;
+    pointer-events: auto;
+    touch-action: none;
+    padding-bottom: 0;
+  }
+
+  .aim-label {
+    font-family: 'Courier New', monospace;
+    font-size: 8px; letter-spacing: 2px;
+    color: rgba(231,76,60,0.7);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  #aim-base {
+    width: 134px; height: 134px;
+    border-radius: 50%;
+    background: rgba(231,76,60,0.07);
+    border: 2px solid rgba(231,76,60,0.35);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 28px rgba(139,0,0,0.4), inset 0 0 20px rgba(0,0,0,0.3);
+    touch-action: none;
+  }
+
+  /* Cruz de mira no centro */
+  .aim-center-dot {
+    position: absolute;
+    width: 12px; height: 12px;
+    pointer-events: none;
+  }
+  .aim-center-dot::before,
+  .aim-center-dot::after {
+    content: '';
+    position: absolute;
+    background: rgba(231,76,60,0.5);
+  }
+  .aim-center-dot::before {
+    width: 12px; height: 1px;
+    top: 50%; left: 0; transform: translateY(-50%);
+  }
+  .aim-center-dot::after {
+    width: 1px; height: 12px;
+    left: 50%; top: 0; transform: translateX(-50%);
+  }
+
+  #aim-knob {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 33%,
+      rgba(231,76,60,0.7), rgba(100,0,0,0.4));
+    border: 2px solid rgba(231,76,60,0.8);
+    position: absolute;
+    pointer-events: none;
+    box-shadow: 0 0 16px rgba(231,76,60,0.5), 0 4px 16px rgba(0,0,0,0.7);
+    will-change: transform;
+    transition: none;
+  }
+
+  /* Feedback visual: pulsa vermelho ao atirar */
+  #aim-base.firing {
+    border-color: rgba(231,76,60,0.9);
+    box-shadow: 0 0 30px rgba(231,76,60,0.7), inset 0 0 20px rgba(100,0,0,0.3);
+  }
+
+  /* Centro — botões de ação */
+  #action-buttons {
+    display: flex; flex-direction: column;
+    gap: 10px; align-items: center;
+    flex-shrink: 0;
+    pointer-events: auto;
+    padding-bottom: 4px;
   }
 }
