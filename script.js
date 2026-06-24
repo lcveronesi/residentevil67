@@ -2203,3 +2203,61 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+// CONTROLES MOBILE
+
+function mobileKeyDown(key){
+    document.dispatchEvent(
+        new KeyboardEvent("keydown",{
+            key:key
+        })
+    );
+}
+
+function mobileKeyUp(key){
+    document.dispatchEvent(
+        new KeyboardEvent("keyup",{
+            key:key
+        })
+    );
+}
+
+const btnUp = document.getElementById("btn-up");
+const btnDown = document.getElementById("btn-down");
+const btnLeft = document.getElementById("btn-left");
+const btnRight = document.getElementById("btn-right");
+
+if(btnUp){
+
+    btnUp.addEventListener("touchstart",()=>{
+        mobileKeyDown("w");
+    });
+
+    btnUp.addEventListener("touchend",()=>{
+        mobileKeyUp("w");
+    });
+
+    btnDown.addEventListener("touchstart",()=>{
+        mobileKeyDown("s");
+    });
+
+    btnDown.addEventListener("touchend",()=>{
+        mobileKeyUp("s");
+    });
+
+    btnLeft.addEventListener("touchstart",()=>{
+        mobileKeyDown("a");
+    });
+
+    btnLeft.addEventListener("touchend",()=>{
+        mobileKeyUp("a");
+    });
+
+    btnRight.addEventListener("touchstart",()=>{
+        mobileKeyDown("d");
+    });
+
+    btnRight.addEventListener("touchend",()=>{
+        mobileKeyUp("d");
+    });
+
+}
